@@ -17,5 +17,6 @@ defmodule Backend.Accounts.Account do
     |> cast(attrs, [:name, :cpf])
     |> cast_assoc(:address, with: &Address.changeset/2)
     |> validate_required([:name, :cpf])
+    |> validate_length(:cpf, is: 11)
   end
 end

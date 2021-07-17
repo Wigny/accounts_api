@@ -5,12 +5,11 @@ defmodule BackendWeb.AccountControllerTest do
   alias Backend.Accounts.Account
 
   @create_attrs %{
-    cpf: "some cpf",
-    name: "some name"
-  }
-  @update_attrs %{
-    cpf: "some updated cpf",
-    name: "some updated name"
+    name: "Wígny Almeida",
+    cpf: "04543413261",
+    address: %{
+      postal_code: "76907-372"
+    }
   }
   @invalid_attrs %{cpf: nil, name: nil}
 
@@ -23,13 +22,6 @@ defmodule BackendWeb.AccountControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
-  describe "index" do
-    test "lists all accounts", %{conn: conn} do
-      conn = get(conn, Routes.account_path(conn, :index))
-      assert json_response(conn, 200)["data"] == []
-    end
-  end
-
   describe "create account" do
     test "renders account when data is valid", %{conn: conn} do
       conn = post(conn, Routes.account_path(conn, :create), account: @create_attrs)
@@ -39,49 +31,19 @@ defmodule BackendWeb.AccountControllerTest do
 
       assert %{
                "id" => id,
-               "cpf" => "some cpf",
-               "name" => "some name"
+               "cpf" => "04543413261",
+               "name" => "Wígny Almeida",
+               "address" => %{
+                 "state" => "RO",
+                 "city" => "Ji-Paraná",
+                 "neighborhood" => "São Bernardo"
+               }
              } = json_response(conn, 200)["data"]
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, Routes.account_path(conn, :create), account: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
-    end
-  end
-
-  describe "update account" do
-    setup [:create_account]
-
-    test "renders account when data is valid", %{conn: conn, account: %Account{id: id} = account} do
-      conn = put(conn, Routes.account_path(conn, :update, account), account: @update_attrs)
-      assert %{"id" => ^id} = json_response(conn, 200)["data"]
-
-      conn = get(conn, Routes.account_path(conn, :show, id))
-
-      assert %{
-               "id" => id,
-               "cpf" => "some updated cpf",
-               "name" => "some updated name"
-             } = json_response(conn, 200)["data"]
-    end
-
-    test "renders errors when data is invalid", %{conn: conn, account: account} do
-      conn = put(conn, Routes.account_path(conn, :update, account), account: @invalid_attrs)
-      assert json_response(conn, 422)["errors"] != %{}
-    end
-  end
-
-  describe "delete account" do
-    setup [:create_account]
-
-    test "deletes chosen account", %{conn: conn, account: account} do
-      conn = delete(conn, Routes.account_path(conn, :delete, account))
-      assert response(conn, 204)
-
-      assert_error_sent 404, fn ->
-        get(conn, Routes.account_path(conn, :show, account))
-      end
     end
   end
 

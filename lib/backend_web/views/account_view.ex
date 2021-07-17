@@ -1,6 +1,6 @@
 defmodule BackendWeb.AccountView do
   use BackendWeb, :view
-  alias BackendWeb.AccountView
+  alias BackendWeb.{AccountView, AddressView}
 
   def render("index.json", %{accounts: accounts}) do
     %{data: render_many(accounts, AccountView, "account.json")}
@@ -11,6 +11,11 @@ defmodule BackendWeb.AccountView do
   end
 
   def render("account.json", %{account: account}) do
-    %{id: account.id, name: account.name, cpf: account.cpf}
+    %{
+      id: account.id,
+      name: account.name,
+      cpf: account.cpf,
+      address: render_one(account.address, AddressView, "address.json")
+    }
   end
 end

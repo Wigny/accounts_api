@@ -35,7 +35,11 @@ defmodule Backend.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_account!(id), do: Repo.get!(Account, id)
+  def get_account(id) do
+    Account
+    |> preload(:address)
+    |> Repo.get(id)
+  end
 
   @doc """
   Creates a account.

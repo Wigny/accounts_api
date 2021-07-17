@@ -16,10 +16,61 @@ defmodule Backend.Accounts.Address do
 
   @doc false
   def changeset(address, attrs) do
-    fields = ~w(street number complement neighborhood city state postal_code)a
+    requireds = ~w(street neighborhood city state postal_code)a
+    fields = requireds ++ ~w(number complement)a
 
     address
     |> cast(attrs, fields)
-    |> validate_required(fields)
+    |> put_requireds()
+    |> validate_required(requireds)
+    |> validate_length(:state, is: 2)
+    |> validate_format(:postal_code, ~r/^\d{5}-\d{3}$/)
   end
+
+  defp put_requireds(changeset) do
+    changeset
+    |> apply_changes()
+    |> update_address(changeset)
+  end
+
+  defp update_address(%{postal_code: nil} = changes, changeset)
+       when not is_nil(changes.state) and
+              not is_nil(changes.city) and
+              not is_nil(changes.street) and
+              not is_nil(changes.neighborhood) do
+    case Backend.ViaCEP.postal_code(changes.state, changes.city, changes.street) do
+      {:ok, %{status: 200, body: body}} when body != [] ->
+        %{cep: cep} =
+          Enum.max_by(body, fn addrs ->
+            String.jaro_distance(addrs.logradouro, changes.street) +
+              String.jaro_distance(addrs.bairro, changes.neighborhood)
+          end)
+
+        put_change(changeset, :postal_code, cep)
+
+      {_status, _env} ->
+        add_error(changeset, :postal_code, "is invalid", additional: "not found")
+    end
+  end
+
+  defp update_address(
+         %{street: nil, city: nil, state: nil, neighborhood: nil} = changes,
+         changeset
+       )
+       when not is_nil(changes.postal_code) do
+    case Backend.ViaCEP.address(changes.postal_code) do
+      {:ok, %{status: 200, body: %{cep: _cep} = body}} ->
+        changeset
+        |> put_change(:street, body.logradouro)
+        |> put_change(:complement, body.complemento)
+        |> put_change(:neighborhood, body.bairro)
+        |> put_change(:city, body.localidade)
+        |> put_change(:state, body.uf)
+
+      {_status, _error} ->
+        add_error(changeset, :postal_code, "is invalid")
+    end
+  end
+
+  defp update_address(_changes, changeset), do: changeset
 end
