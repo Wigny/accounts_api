@@ -53,12 +53,12 @@ defmodule Backend.Accounts.Address do
     end
   end
 
-  defp update_address(
-         %{street: nil, city: nil, state: nil, neighborhood: nil} = changes,
-         changeset
-       )
-       when not is_nil(changes.postal_code) do
-    case Backend.ViaCEP.address(changes.postal_code) do
+  defp update_address(%{postal_code: postal_code} = changes, changeset)
+       when is_nil(changes.state) or
+              is_nil(changes.city) or
+              is_nil(changes.street) or
+              is_nil(changes.neighborhood) do
+    case Backend.ViaCEP.address(postal_code) do
       {:ok, %{status: 200, body: %{cep: _cep} = body}} ->
         changeset
         |> put_change(:street, body.logradouro)

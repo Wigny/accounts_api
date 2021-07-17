@@ -11,7 +11,10 @@ defmodule BackendWeb.AccountControllerTest do
       postal_code: "76907-372"
     }
   }
-  @invalid_attrs %{cpf: nil, name: nil}
+
+  @update_attrs %{cpf: "", address: %{postal_code: "76900-121"}}
+
+  @invalid_attrs %{cpf: nil, name: nil, address: %{}}
 
   def fixture(:account) do
     {:ok, account} = Accounts.create_account(@create_attrs)
@@ -43,6 +46,31 @@ defmodule BackendWeb.AccountControllerTest do
 
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, Routes.account_path(conn, :create), account: @invalid_attrs)
+      assert json_response(conn, 422)["errors"] != %{}
+    end
+  end
+
+  describe "update account" do
+    setup [:create_account]
+
+    test "renders account when data is valid", %{
+      conn: conn,
+      account: %Account{id: id, cpf: cpf} = account
+    } do
+      conn = put(conn, Routes.account_path(conn, :update, account), account: @update_attrs)
+      assert %{"id" => ^id, "cpf" => ^cpf} = json_response(conn, 200)["data"]
+
+      conn = get(conn, Routes.account_path(conn, :show, id))
+
+      assert %{
+               "id" => id,
+               "cpf" => cpf,
+               "address" => %{"neighborhood" => "Centro"}
+             } = json_response(conn, 200)["data"]
+    end
+
+    test "renders errors when data is invalid", %{conn: conn, account: account} do
+      conn = put(conn, Routes.account_path(conn, :update, account), account: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
