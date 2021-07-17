@@ -10,6 +10,7 @@ defmodule Backend.Accounts.Address do
     field :postal_code, :string
     field :state, :string
     field :street, :string
+    field :account_id, :id
 
     timestamps()
   end

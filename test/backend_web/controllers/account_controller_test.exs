@@ -75,6 +75,18 @@ defmodule BackendWeb.AccountControllerTest do
     end
   end
 
+  describe "delete account" do
+    setup [:create_account]
+
+    test "deletes chosen account", %{conn: conn, account: account} do
+      conn = delete(conn, Routes.account_path(conn, :delete, account))
+      assert response(conn, 204)
+
+      conn = get(conn, Routes.account_path(conn, :show, account))
+      assert response(conn, 404)
+    end
+  end
+
   defp create_account(_) do
     account = fixture(:account)
     %{account: account}

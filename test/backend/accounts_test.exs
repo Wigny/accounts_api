@@ -53,6 +53,12 @@ defmodule Backend.AccountsTest do
       assert {:ok, account} == Accounts.get_account(account.id)
     end
 
+    test "delete_account/1 deletes the account" do
+      account = account_fixture()
+      assert {:ok, %Account{}} = Accounts.delete_account(account)
+      assert {:error, :not_found} == Accounts.get_account(account.id)
+    end
+
     test "change_account/1 returns a account changeset" do
       account = account_fixture()
       assert %Ecto.Changeset{} = Accounts.change_account(account)

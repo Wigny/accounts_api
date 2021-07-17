@@ -6,7 +6,7 @@ defmodule Backend.Accounts.Account do
   schema "accounts" do
     field :cpf, :string
     field :name, :string
-    belongs_to :address, Address, on_replace: :update
+    has_one :address, Address, on_replace: :update
 
     timestamps()
   end
@@ -17,9 +17,9 @@ defmodule Backend.Accounts.Account do
   def changeset(account, attrs, action: :insert) do
     changeset =
       account
-      |> cast(attrs, [:name, :cpf])
+      |> cast(attrs, [:cpf, :name])
       |> cast_assoc(:address)
-      |> validate_required([:name, :cpf])
+      |> validate_required([:cpf, :name])
       |> validate_length(:cpf, is: 11)
 
     %{changeset | action: :insert}
