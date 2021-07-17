@@ -25,6 +25,13 @@ defmodule BackendWeb.AccountControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
+  describe "index" do
+    test "lists all accounts", %{conn: conn} do
+      conn = get(conn, Routes.account_path(conn, :index))
+      assert json_response(conn, 200)["data"] == []
+    end
+  end
+
   describe "create account" do
     test "renders account when data is valid", %{conn: conn} do
       conn = post(conn, Routes.account_path(conn, :create), account: @create_attrs)
@@ -33,7 +40,7 @@ defmodule BackendWeb.AccountControllerTest do
       conn = get(conn, Routes.account_path(conn, :show, id))
 
       assert %{
-               "id" => id,
+               "id" => ^id,
                "cpf" => "04543413261",
                "name" => "Wígny Almeida",
                "address" => %{
@@ -63,8 +70,8 @@ defmodule BackendWeb.AccountControllerTest do
       conn = get(conn, Routes.account_path(conn, :show, id))
 
       assert %{
-               "id" => id,
-               "cpf" => cpf,
+               "id" => ^id,
+               "cpf" => ^cpf,
                "address" => %{"neighborhood" => "Centro"}
              } = json_response(conn, 200)["data"]
     end

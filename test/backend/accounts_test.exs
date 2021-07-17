@@ -25,6 +25,11 @@ defmodule Backend.AccountsTest do
       account
     end
 
+    test "list_accounts/0 returns all accounts" do
+      account = account_fixture()
+      assert Accounts.list_accounts() == [account]
+    end
+
     test "get_account/1 returns the account with given id" do
       account = account_fixture()
       assert Accounts.get_account(account.id) == {:ok, account}

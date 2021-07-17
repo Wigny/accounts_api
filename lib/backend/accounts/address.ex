@@ -41,11 +41,7 @@ defmodule Backend.Accounts.Address do
               not is_nil(changes.neighborhood) do
     case Backend.ViaCEP.postal_code(changes.state, changes.city, changes.street) do
       {:ok, %{status: 200, body: body}} when body != [] ->
-        %{cep: cep} =
-          Enum.max_by(body, fn addrs ->
-            String.jaro_distance(addrs.logradouro, changes.street) +
-              String.jaro_distance(addrs.bairro, changes.neighborhood)
-          end)
+        %{cep: cep} = Enum.max_by(body, &addrs_similarity(&1, changes))
 
         put_change(changeset, :postal_code, cep)
 
@@ -74,4 +70,11 @@ defmodule Backend.Accounts.Address do
   end
 
   defp update_address(_changes, changeset), do: changeset
+
+  defp addrs_similarity(addrs, changes) do
+    street_similarity = String.jaro_distance(addrs.logradouro, changes.street)
+    neighborhood_similarity = String.jaro_distance(addrs.bairro, changes.neighborhood)
+
+    street_similarity + neighborhood_similarity
+  end
 end

@@ -6,8 +6,11 @@ defmodule BackendWeb.AccountController do
 
   action_fallback BackendWeb.FallbackController
 
-  def index(conn, _params) do
-    accounts = Accounts.list_accounts()
+  def index(conn, params) do
+    page = params |> Map.get("page", "1") |> String.to_integer()
+    size = params |> Map.get("size", "50") |> String.to_integer()
+
+    accounts = Accounts.list_accounts(page, size)
     render(conn, "index.json", accounts: accounts)
   end
 
