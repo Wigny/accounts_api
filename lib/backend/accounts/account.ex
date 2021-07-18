@@ -21,6 +21,7 @@ defmodule Backend.Accounts.Account do
       |> cast_assoc(:address)
       |> validate_required([:cpf, :name])
       |> validate_length(:cpf, is: 11)
+      |> unique_constraint(:cpf)
 
     %{changeset | action: :insert}
   end
