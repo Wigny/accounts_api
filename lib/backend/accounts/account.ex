@@ -12,7 +12,7 @@ defmodule Backend.Accounts.Account do
   end
 
   @doc false
-  def changeset(account, attrs, opts \\ [action: :insert])
+  def changeset(account \\ %__MODULE__{}, attrs \\ %{}, opts \\ [action: :insert])
 
   def changeset(account, attrs, action: :insert) do
     changeset =

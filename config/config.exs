@@ -14,7 +14,7 @@ config :backend,
 config :backend, BackendWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "mYiLYAcy23EjbGfOxWJvH4NDTM5G8BKyIcRKdT19DDNIJMEVvX8Fx1IQ1wxEWG3p",
-  render_errors: [view: BackendWeb.ErrorView, accepts: ~w(html json), layout: false],
+  render_errors: [view: BackendWeb.ErrorView, accepts: ~w(json), layout: false],
   pubsub_server: Backend.PubSub,
   live_view: [signing_salt: "ycgsQ81y"]
 

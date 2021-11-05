@@ -30,9 +30,9 @@ defmodule Backend.AccountsTest do
       assert Accounts.list_accounts() == [account]
     end
 
-    test "get_account/1 returns the account with given id" do
+    test "get_account!/1 returns the account with given id" do
       account = account_fixture()
-      assert Accounts.get_account(account.id) == {:ok, account}
+      assert Accounts.get_account!(account.id) == account
     end
 
     test "create_account/1 with valid data creates a account" do
@@ -55,13 +55,13 @@ defmodule Backend.AccountsTest do
     test "update_account/2 with invalid data returns error changeset" do
       account = account_fixture()
       assert {:error, %Ecto.Changeset{}} = Accounts.update_account(account, @invalid_attrs)
-      assert {:ok, account} == Accounts.get_account(account.id)
+      assert account == Accounts.get_account!(account.id)
     end
 
     test "delete_account/1 deletes the account" do
       account = account_fixture()
       assert {:ok, %Account{}} = Accounts.delete_account(account)
-      assert {:error, :not_found} == Accounts.get_account(account.id)
+      assert_raise Ecto.NoResultsError, fn -> Accounts.get_account!(account.id) end
     end
 
     test "change_account/1 returns a account changeset" do

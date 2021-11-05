@@ -16,14 +16,10 @@ defmodule Backend.Accounts do
     |> Repo.all()
   end
 
-  def get_account(id) do
+  def get_account!(id) do
     Account
     |> preload(:address)
-    |> Repo.get(id)
-    |> case do
-      nil -> {:error, :not_found}
-      account -> {:ok, account}
-    end
+    |> Repo.get!(id)
   end
 
   def create_account(attrs \\ %{}) do

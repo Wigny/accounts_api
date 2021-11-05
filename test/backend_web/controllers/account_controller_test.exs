@@ -89,8 +89,9 @@ defmodule BackendWeb.AccountControllerTest do
       conn = delete(conn, Routes.account_path(conn, :delete, account))
       assert response(conn, 204)
 
-      conn = get(conn, Routes.account_path(conn, :show, account))
-      assert response(conn, 404)
+      assert_error_sent 404, fn ->
+        get(conn, Routes.account_path(conn, :show, account))
+      end
     end
   end
 
